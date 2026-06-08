@@ -8,7 +8,7 @@
 fs = 20000;          % Frequência de amostragem
 N = 64;              % Tamanho do bloco (16-1024) => Maior/menor eixo X
 f_tom = 1870;        % Frequência do buzzer (0-10k) => Maior/menor "velocidade" do sinal
-Amp = 1000;           % Amplitude do sinal do microfone (0-2048) => Maior/menor amplitude do sinal
+Amp = 1000;          % Amplitude do sinal do microfone (0-2048) => Maior/menor amplitude do sinal
 
 % Gerar sinais
 n = 0:N-1;           % Vetor de amostras discreto

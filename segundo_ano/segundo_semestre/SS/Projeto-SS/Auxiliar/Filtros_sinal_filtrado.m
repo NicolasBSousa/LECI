@@ -9,19 +9,18 @@ clear all; close all; clc;
 pkg load signal; 
 
 %% Parâmetros do Sistema
-Fs = 8000;              % Frequência de amostragem (Hz)
-Ts = 1 / Fs;            % Período de amostragem
-N_taps = 128;           % Tamanho do buffer no ESP32 (e tamanho do filtro)
-order = N_taps - 1;     % Ordem do filtro FIR (127)
-BW = 100;               % Largura de banda de +/- 100 Hz para cada tom
+Fs = 20000;            % Frequência de amostragem (Hz)
+Ts = 1 / Fs;           % Período de amostragem
+N_taps = 64;           % Tamanho do buffer no ESP32 (e tamanho do filtro)
+order = N_taps - 1;    % Ordem do filtro FIR (31, 63, 127, ...)
+BW = 50;               % Largura de banda de +/- 100 Hz para cada tom
 
 % As nossas Frequências Secretas
 f0 = 1500;
 f1 = 2220;
 f2 = 2940;
 
-%  Desenho dos Filtros FIR (Usando fir1 com Janela de Hamming embutida)
-% Tal como o professor fez no h_alpha e h_beta, mas para os nossos tons
+%  Desenho dos Filtros FIR 
 f_banda0 = [f0-BW, f0+BW];
 f_banda1 = [f1-BW, f1+BW];
 f_banda2 = [f2-BW, f2+BW];
@@ -48,7 +47,7 @@ fprintf('%f, ', h2(1:end-1)); fprintf('%f};\n', h2(end));
 fprintf('// -----------------------------------------------------\n\n');
 
 %% SIMULAÇÃO: Processamento do som na EPS32
-% Vamos criar um "sinal falso" de 1 segundo que tem o Tom '1' (2220 Hz) e muito ruído
+% Criação de sinal com ruido 
 t = 0:Ts:1-Ts;
 sinal_mic = 1.0 * sin(2*pi*f1*t) + 0.5 * randn(size(t)); % Tom 1 + Ruído
 
@@ -57,8 +56,7 @@ saida0 = filter(h0, 1, sinal_mic);
 saida1 = filter(h1, 1, sinal_mic);
 saida2 = filter(h2, 1, sinal_mic);
 
-% Lógica de Janelas (Thresholding) tal como no _30_EEGSignalRestDetection.m
-% Vamos analisar apenas o primeiro bloco de amostras (tal como o FIFO do ESP32 faz)
+% Lógica de Janelas (Thresholding)
 janela0 = saida0(1:N_taps);
 janela1 = saida1(1:N_taps);
 janela2 = saida2(1:N_taps);
@@ -83,7 +81,7 @@ end
 %% Visualização de Resultados
 figure('Position', [100, 100, 1000, 800]);
 
-% Gráfico 1: Resposta em Frequência (Igual ao _11_LowPassStudyStud.m)
+% Gráfico 1: Resposta em Frequência
 [H0, f_plot] = freqz(h0, 1, 2048, Fs);
 [H1, ~] = freqz(h1, 1, 2048, Fs);
 [H2, ~] = freqz(h2, 1, 2048, Fs);
